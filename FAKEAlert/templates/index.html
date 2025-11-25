@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        {% if not posts %}
+            <div class="text-center py-5">
+                <i class="fas fa-newspaper fa-3x mb-3 text-secondary opacity-25"></i>
+                <p class="text-muted">Nenhuma notícia encontrada.</p>
+            </div>
+        {% endif %}
+        
+        <!-- MUDANÇA: Usando grid Masonry em vez de colunas Bootstrap -->
+        <div class="masonry-grid">
+            {% for post in posts %}
+            <div class="masonry-item">
+                <div class="news-card" id="post-{{ post.id }}">
+                    <div class="position-relative">
+                        <img src="{{ post.image_url or 'https://via.placeholder.com/400x200?text=Sem+Imagem' }}" class="card-img-top" alt="Capa" onerror="this.src='https://via.placeholder.com/400x200?text=Erro+Imagem'">
+                        <div class="position-absolute top-0 start-0 m-2">
+                            {% if post.verified %}
+                                <span class="badge-verified"><i class="fas fa-check-circle"></i> Confiável</span>
+                            {% else %}
+                                <span class="badge-fake"><i class="fas fa-exclamation-triangle"></i> Fake News</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="card-body">
+                        <div class="meta-text">
+                            <span style="color: var(--brand-color);">{{ post.author }}</span>
+                            <span>{{ post.category }}</span>
+                        </div>
+                        
+                        <h5 class="card-title">{{ post.title }}</h5>
+                        
+                        <!-- Texto com Toggle -->
+                        <div class="content-area" onclick="toggleText({{ post.id }})" style="cursor: pointer;">
+                            <p class="card-text" id="text-{{ post.id }}" 
+                               style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 4px; transition: all 0.3s;">
+                                {{ post.content }}
+                            </p>
+                            
+                            {% if post.content|length > 150 %}
+                                <small class="fw-bold text-secondary expand-btn" id="btn-{{ post.id }}">
+                                    Ler mais <i class="fas fa-chevron-down"></i>
+                                </small>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="ai-result-box d-none"></div>
+
+                        <div class="mt-auto pt-3 border-top d-flex justify-content-between align-items-center text-muted small">
+                            <div class="d-flex gap-3 align-items-center">
+                                <button onclick="toggleLike({{ post.id }})" class="btn-icon border-0 bg-transparent p-0 d-flex align-items-center gap-1" title="Curtir">
+                                    {% if current_user.is_authenticated and post in current_user.liked_posts %}
+                                        <i class="fas fa-heart" style="color: #d13438;" id="like-icon-{{ post.id }}"></i>
+                                        <span style="color: #d13438; font-weight: bold;" id="like-count-{{ post.id }}">{{ post.liked_by.count() }}</span>
+                                    {% else %}
+                                        <i class="far fa-heart" id="like-icon-{{ post.id }}"></i>
+                                        <span id="like-count-{{ post.id }}">{{ post.liked_by.count() }}</span>
+                                    {% endif %}
+                                </button>
+
+                                <button onclick="toggleSave({{ post.id }})" class="btn-icon border-0 bg-transparent p-0" title="Salvar">
+                                    {% if current_user.is_authenticated and post in current_user.saved_posts %}
+                                        <i class="fas fa-bookmark" style="color: var(--brand-color);" id="save-icon-{{ post.id }}"></i>
+                                    {% else %}
+                                        <i class="far fa-bookmark" id="save-icon-{{ post.id }}"></i>
+                                    {% endif %}
+                                </button>
+
+                                <button onclick="verifyWithAI({{ post.id }}, `{{ post.title }}`, `{{ post.content }}`)" class="btn-icon border-0 bg-transparent p-0" title="Verificar com IA">
+                                    <i class="fas fa-robot" style="color: var(--brand-color);"></i>
+                                </button>
+                            </div>
+                            <span><i class="far fa-clock me-1"></i> {{ post.date_posted.strftime('%d/%m') }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<script>
+// Mantém apenas um card aberto por vez e atualiza o layout do Masonry
+let currentOpenId = null;
+
+function toggleText(id) {
+    const text = document.getElementById(`text-${id}`);
+    const btn = document.getElementById(`btn-${id}`);
+    if (!btn) return;
+
+    // Fecha anterior se houver
+    if (currentOpenId !== null && currentOpenId !== id) {
+        const oldText = document.getElementById(`text-${currentOpenId}`);
+        const oldBtn = document.getElementById(`btn-${currentOpenId}`);
+        if (oldText && oldBtn) {
+            oldText.style.webkitLineClamp = '3';
+            oldText.style.display = '-webkit-box';
+            oldBtn.innerHTML = 'Ler mais <i class="fas fa-chevron-down"></i>';
+        }
+    }
+
+    // Abre/Fecha atual
+    if (text.style.webkitLineClamp === '3') {
+        text.style.webkitLineClamp = 'unset';
+        text.style.display = 'block';
+        btn.innerHTML = 'Ler menos <i class="fas fa-chevron-up"></i>';
+        currentOpenId = id;
+    } else {
+        text.style.webkitLineClamp = '3';
+        text.style.display = '-webkit-box';
+        btn.innerHTML = 'Ler mais <i class="fas fa-chevron-down"></i>';
+        currentOpenId = null;
+    }
+}
+
+async function toggleLike(postId) {
+    try {
+        const response = await fetch(`/like/${postId}`, { method: 'POST' });
+        if (response.redirected) window.location.href = response.url;
+        const data = await response.json();
+        const icon = document.getElementById(`like-icon-${postId}`);
+        const count = document.getElementById(`like-count-${postId}`);
+        count.innerText = data.count;
+        if (data.liked) {
+            icon.classList.replace('far', 'fas');
+            icon.style.color = '#d13438';
+            count.style.color = '#d13438';
+            count.style.fontWeight = 'bold';
+        } else {
+            icon.classList.replace('fas', 'far');
+            icon.style.color = '';
+            count.style.color = '';
+            count.style.fontWeight = 'normal';
+        }
+    } catch (e) {}
+}
+
+async function toggleSave(postId) {
+    try {
+        const response = await fetch(`/save/${postId}`, { method: 'POST' });
+        if (response.redirected) window.location.href = response.url;
+        const data = await response.json();
+        const icon = document.getElementById(`save-icon-${postId}`);
+        if (data.saved) {
+            icon.classList.replace('far', 'fas');
+            icon.style.color = 'var(--brand-color)';
+        } else {
+            icon.classList.replace('fas', 'far');
+            icon.style.color = '';
+        }
+    } catch (e) {}
+}
+
+async function verifyWithAI(postId, title, content) {
+    const card = document.getElementById(`post-${postId}`);
+    const resultBox = card.querySelector('.ai-result-box');
+    
+    if (!resultBox.classList.contains('d-none')) {
+        resultBox.classList.add('d-none');
+        return;
+    }
+    
+    resultBox.classList.remove('d-none');
+    resultBox.innerHTML = "<i class='fas fa-circle-notch fa-spin'></i> Analisando...";
+    
+    try {
+        const response = await fetch('/api/verify_fact', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ title: title, content: content })
+        });
+        const data = await response.json();
+        resultBox.innerHTML = `<strong>${data.result}:</strong> ${data.text}`;
+    } catch {
+        resultBox.innerHTML = "<span class='text-danger'>Erro na IA.</span>";
+    }
+}
+</script>
+{% endblock %}

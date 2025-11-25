@@ -1,0 +1,308 @@
+/* --- VARIÁVEIS DE DESIGN (TEMA FRANGO ALERT) --- */
+:root {
+    --bg-body: #fefaf6;
+    --bg-card: #ffffff;
+    --text-primary: #242424;
+    --text-secondary: #605e5c;
+    
+    /* Laranja Frango */
+    --brand-color: #F7931E;
+    --brand-hover: #d37206;
+    
+    --border-color: #ebe0d5;
+    --success-bg: #dff6dd; 
+    --success-text: #107c10;
+    --danger-bg: #fde7e9; 
+    --danger-text: #a80000;
+    --shadow-sm: 0 2px 4px rgba(247, 147, 30, 0.08);
+    --shadow-md: 0 8px 16px rgba(247, 147, 30, 0.15);
+    
+    --radius-sm: 6px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+}
+
+/* MODO ESCURO */
+body.dark-mode {
+    --bg-body: #1a1510;
+    --bg-card: #29221c;
+    --text-primary: #fcefe3;
+    --text-secondary: #c4b5a5;
+    --brand-color: #ffad4d;
+    --brand-hover: #ffca8a;
+    --border-color: #453a32;
+    --shadow-sm: 0 2px 4px rgba(0,0,0,0.4);
+    --shadow-md: 0 8px 16px rgba(0,0,0,0.6);
+    --success-bg: #052e05; 
+    --success-text: #4ade80;
+    --danger-bg: #3d0509; 
+    --danger-text: #fca5a5;
+}
+
+/* RESET GLOBAL */
+body {
+    background-color: var(--bg-body);
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--text-primary);
+    padding-top: 80px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    margin: 0;
+}
+
+a { text-decoration: none; transition: all 0.2s; }
+
+/* NAVBAR */
+.navbar {
+    background-color: var(--bg-card);
+    border-bottom: 1px solid var(--border-color);
+    height: 70px;
+    box-shadow: var(--shadow-sm);
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.navbar-brand {
+    font-weight: 800;
+    font-size: 1.35rem;
+    color: var(--text-primary) !important;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    letter-spacing: -0.5px;
+    text-decoration: none;
+}
+
+.nav-link {
+    color: var(--text-secondary) !important;
+    font-weight: 600;
+    padding: 8px 16px !important;
+    border-radius: 50px;
+    display: inline-block;
+}
+
+.nav-link:hover, .nav-link.active {
+    color: #fff !important;
+    background-color: var(--brand-color);
+}
+
+/* BUSCA */
+.search-bar {
+    background-color: var(--bg-body);
+    border: 2px solid transparent;
+    border-radius: 99px;
+    padding: 6px 20px;
+    display: flex;
+    align-items: center;
+    transition: all 0.2s;
+}
+.search-bar input { 
+    background: transparent; 
+    border: none; 
+    outline: none; 
+    width: 100%; 
+    margin-left: 8px; 
+    color: var(--text-primary); 
+}
+.search-bar:focus-within { 
+    border-color: var(--brand-color); 
+    background-color: var(--bg-card); 
+}
+
+/* CARDS (Ajustados para Masonry) */
+.news-card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    display: flex; 
+    flex-direction: column; 
+    /* height: 100%; REMOVIDO para o card encolher e esticar livremente */
+    transition: transform 0.2s, box-shadow 0.2s;
+    position: relative;
+    width: 100%; /* Garante que o card use a largura da coluna */
+}
+.news-card:hover { 
+    transform: translateY(-4px); 
+    box-shadow: var(--shadow-md); 
+    border-color: var(--brand-color); 
+}
+
+.card-img-top { 
+    height: 200px; 
+    width: 100%; 
+    object-fit: cover; 
+    background-color: #ffeedb; 
+    display: block;
+}
+
+.card-body { 
+    padding: 24px; 
+    display: flex; 
+    flex-direction: column; 
+    flex: 1; 
+}
+
+.card-title { 
+    font-size: 1.2rem; 
+    font-weight: 800; 
+    margin-bottom: 10px; 
+    color: var(--text-primary); 
+    line-height: 1.2; 
+}
+
+.meta-text { 
+    font-size: 0.7rem; 
+    font-weight: 700; 
+    text-transform: uppercase; 
+    color: var(--brand-color); 
+    margin-bottom: 12px; 
+    display: flex; 
+    justify-content: space-between; 
+    letter-spacing: 0.5px; 
+}
+
+.card-text { 
+    color: var(--text-secondary); 
+    font-size: 0.95rem; 
+    line-height: 1.6; 
+}
+
+/* --- NOVO LAYOUT MASONRY (PINTEREST) --- */
+.masonry-grid {
+    column-count: 3; /* 3 colunas no desktop */
+    column-gap: 24px;
+}
+
+.masonry-item {
+    break-inside: avoid; /* Impede que o card seja cortado ao meio */
+    margin-bottom: 24px; /* Espaço embaixo de cada card */
+    display: inline-block; /* Essencial para o break-inside funcionar */
+    width: 100%;
+}
+
+/* Responsividade do Masonry */
+@media (max-width: 1200px) {
+    .masonry-grid { column-count: 2; }
+}
+@media (max-width: 768px) {
+    .masonry-grid { column-count: 1; }
+}
+
+/* BOTÕES */
+.btn-msn {
+    background-color: var(--brand-color);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 10px 24px;
+    font-weight: 700;
+    display: inline-flex; 
+    align-items: center; 
+    justify-content: center; 
+    gap: 8px;
+    box-shadow: 0 4px 10px rgba(247, 147, 30, 0.3);
+    cursor: pointer;
+}
+.btn-msn:hover { 
+    background-color: var(--brand-hover); 
+    color: white; 
+    transform: scale(1.02); 
+}
+
+.btn-icon { 
+    color: var(--text-secondary); 
+    padding: 8px; 
+    border-radius: 50%; 
+    transition: all 0.2s; 
+    background: transparent;
+    border: none;
+    cursor: pointer;
+}
+.btn-icon:hover { 
+    background-color: rgba(247, 147, 30, 0.1); 
+    color: var(--brand-color); 
+}
+
+.btn-theme {
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 1.2rem;
+    padding: 8px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.btn-theme:hover {
+    background-color: rgba(247, 147, 30, 0.1);
+    color: var(--brand-color);
+}
+.btn-theme:focus { outline: none; }
+
+/* BADGES */
+.badge-verified { 
+    background-color: var(--success-bg); 
+    color: var(--success-text); 
+    border: 1px solid rgba(16, 124, 16, 0.2); 
+    padding: 4px 8px; 
+    border-radius: 4px; 
+    font-size: 0.7rem; 
+    font-weight: 700; 
+    text-transform: uppercase; 
+    display: inline-flex; 
+    align-items: center; 
+    gap: 4px; 
+}
+
+.badge-fake { 
+    background-color: var(--danger-bg); 
+    color: var(--danger-text); 
+    border: 1px solid rgba(168, 0, 0, 0.2); 
+    padding: 4px 8px; 
+    border-radius: 4px; 
+    font-size: 0.7rem; 
+    font-weight: 700; 
+    text-transform: uppercase; 
+    display: inline-flex; 
+    align-items: center; 
+    gap: 4px; 
+}
+
+/* FORMULÁRIOS */
+.form-control, .form-select { 
+    background-color: var(--bg-body); 
+    border: 2px solid var(--border-color); 
+    border-radius: var(--radius-md); 
+    color: var(--text-primary); 
+    padding: 12px; 
+    width: 100%;
+    box-sizing: border-box;
+}
+.form-control:focus { 
+    border-color: var(--brand-color); 
+    box-shadow: none; 
+    outline: none; 
+}
+
+/* RESULTADO IA */
+.ai-result-box { 
+    background-color: #fff8e1; 
+    border: 2px solid #ffecb3; 
+    color: #8a5a00; 
+    border-radius: var(--radius-md); 
+    padding: 16px; 
+    margin-top: 16px; 
+}
+
+/* ADMIN TABLE */
+.admin-table { width: 100%; border-collapse: collapse; }
+.admin-table th { background-color: var(--bg-body); padding: 16px; font-size: 0.8rem; text-transform: uppercase; color: var(--text-secondary); text-align: left; border-bottom: 2px solid var(--border-color); }
+.admin-table td { padding: 16px; border-bottom: 1px solid var(--border-color); vertical-align: middle; color: var(--text-primary); }
+.admin-table tr:hover { background-color: var(--bg-body); }
