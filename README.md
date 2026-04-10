@@ -1,44 +1,53 @@
-- **Backend:** Python com Flask (roteamento, lógica de negócio e integração com API)
-- **Banco de Dados:** SQLite com SQLAlchemy (persistência de dados e relacionamentos)
-- **Frontend:** HTML5, CSS3 e JavaScript (requisições assíncronas com AJAX)
-- **IA:** Integração com Google Generative AI (Gemini)
+# 🐔 FrangoAlert
+
+Plataforma web para verificação de notícias utilizando inteligência artificial.  
+O sistema analisa textos e retorna uma avaliação sobre possível fake news.
+
+---
+
+## 🚀 Acesse o projeto
+
+https://alert.frangro.com.br
+
+---
+
+## 📌 Funcionalidades
+
+- Análise de textos com IA
+- Classificação de conteúdo
+- Interface simples e responsiva
+- Feedback em tempo real
+
+---
+
+## 🧠 Arquitetura
+
+- Backend: Flask (Python)
+- Banco de Dados: SQLite + SQLAlchemy
+- Frontend: HTML, CSS, JavaScript (AJAX)
+- IA: Google Gemini
 
 ---
 
 ## 🔄 Fluxo da aplicação
 
-1. Usuário envia um texto pelo frontend
-2. O frontend envia a requisição via AJAX para o backend (Flask)
-3. O backend processa o texto e envia para a API do Gemini
-4. A IA retorna uma análise do conteúdo
-5. O backend formata a resposta
-6. O resultado é exibido ao usuário em tempo real
+1. Usuário envia texto
+2. Backend recebe via Flask
+3. Texto é enviado para o Gemini
+4. IA retorna análise
+5. Resultado é exibido
 
 ---
 
-## 📂 Estrutura do projeto
+## 🛠 Tecnologias
 
-
-/FrangoAlert
-│
-├── FAKEAlert/ # Backend e lógica da aplicação
-├── static/ # Arquivos estáticos (CSS, JS)
-├── templates/ # HTML (caso use Flask templates)
-└── README.md
-
-
-## 🛠 Tecnologias utilizadas
-
-- Python
-- Flask
-- SQLite
-- SQLAlchemy
-- HTML5, CSS3, JavaScript
-- Google Generative AI (Gemini)
+Python • Flask • SQLite • SQLAlchemy • JavaScript • HTML • CSS • Gemini API
 
 ---
 
 ## 🧪 Como rodar o projeto
+
+```bash
 
 git clone https://github.com/imthedavi/FrangoAlert
 cd FrangoAlert
@@ -54,3 +63,4 @@ python app.py
 Acesse no navegador:
 
 http://localhost:5000
+---
