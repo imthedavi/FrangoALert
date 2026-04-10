@@ -27,8 +27,6 @@
 └── README.md
 
 
----
-
 ## 🛠 Tecnologias utilizadas
 
 - Python
