@@ -1,93 +1,58 @@
-🐔 FrangoAlert – O detector de fake news mais galináceo da internet
+- **Backend:** Python com Flask (roteamento, lógica de negócio e integração com API)
+- **Banco de Dados:** SQLite com SQLAlchemy (persistência de dados e relacionamentos)
+- **Frontend:** HTML5, CSS3 e JavaScript (requisições assíncronas com AJAX)
+- **IA:** Integração com Google Generative AI (Gemini)
 
-Bem-vindo ao FrangoAlert, o projeto que desmascara fake news com a precisão de um galo vigilante e o bom humor digno de um frango bem temperado.
-Aqui, você pode usar a inteligência artificial integrada ao site para verificar notícias suspeitas — tudo isso com uma pitada de diversão. 😄
+---
 
-🚨 O que é o FrangoAlert?
+## 🔄 Fluxo da aplicação
 
-O FrangoAlert é uma plataforma criada para ajudar usuários a verificar a veracidade de notícias, mensagens e conteúdos compartilhados online.
-Com uma interface amigável e uma IA treinada para identificar possíveis informações falsas, o sistema retorna alertas, análises e uma resposta bem-humorada sobre o conteúdo.
+1. Usuário envia um texto pelo frontend
+2. O frontend envia a requisição via AJAX para o backend (Flask)
+3. O backend processa o texto e envia para a API do Gemini
+4. A IA retorna uma análise do conteúdo
+5. O backend formata a resposta
+6. O resultado é exibido ao usuário em tempo real
 
-🧠 Como funciona?
+---
 
-Você envia a notícia – Copie e cole o texto ou faça upload do conteúdo.
+## 📂 Estrutura do projeto
 
-A IA lê, analisa e investiga – Como um frango detetive, ela cisca cada detalhe.
 
-Retorno instantâneo – O sistema informa se há cheiro de fake news ou se está tudo limpinho no terreiro.
-
-Humor incluso – Porque combater a desinformação não precisa ser chato.
-
-🗂 Estrutura do Repositório
 /FrangoAlert
 │
-├── FAKEAlert/                     # Arquivos internos e lógica do backend
-├── Apresentação FrangoAlert.pdf  # Versão inicial da apresentação
-├── Apresentação FrangoAlertdefinitivo.pdf # Apresentação final do projeto
-└── README.md                     # Este arquivo
-
-🌐 Funcionalidades do Site
-
-✔️ Verificação de notícias usando IA
-
-✔️ Interface simples e direta
-
-✔️ Alertas estilizados com humor
-
-✔️ Visual limpo e acessível
-
-✔️ Ideal para escola, faculdade ou projetos de combate à desinformação
-
-🐓 Por que “Frango Alert”?
-
-Porque faltava um detector de fake news que fosse:
-
-Engraçado
-
-Memorável
-
-Inusitado
-
-E, claro, com personalidade!
-
-E nada simboliza melhor isso do que um frango hiperalerta com a missão de salvar o mundo da desinformação.
-
-🛠 Tecnologias usadas (sugestão — ajuste conforme seu projeto)
-
-HTML / CSS / JavaScript – Estrutura e interface do site
-
-Python / Node.js – Backend e integração (se aplicável)
-
-API de IA – Para análise de conteúdo
-
-GitHub Pages / Hosting – Hospedagem do site
-
-🧪 Como rodar o projeto
-
-Clone o repositório:
-
-git clone https://github.com/SEU-USUARIO/FrangoAlert
+├── FAKEAlert/ # Backend e lógica da aplicação
+├── static/ # Arquivos estáticos (CSS, JS)
+├── templates/ # HTML (caso use Flask templates)
+└── README.md
 
 
-Acesse a pasta do projeto:
+---
 
+## 🛠 Tecnologias utilizadas
+
+- Python
+- Flask
+- SQLite
+- SQLAlchemy
+- HTML5, CSS3, JavaScript
+- Google Generative AI (Gemini)
+
+---
+
+## 🧪 Como rodar o projeto
+
+git clone https://github.com/imthedavi/FrangoAlert
 cd FrangoAlert
 
+Instale as dependências:
 
-Abra o arquivo index.html no navegador ou inicie o servidor (caso use backend).
+pip install -r requirements.txt
 
-🐣 Contribuição
+Execute o servidor:
 
-Sinta-se livre para contribuir!
-Sugestões de melhorias, humor extra ou novas formas de detectar fake news são muito bem-vindas.
+python app.py
 
-📜 Licença
+Acesse no navegador:
 
-Este projeto é de uso público. Use, remixe e compartilhe!
-
-Se quiser, posso gerar também:
-
-✅ Uma versão em inglês
-✅ Uma versão mais séria
-✅ Uma versão com emojis reduzidos
-✅ Uma versão com badges e seções adicionais
+http://localhost:5000
