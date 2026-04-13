@@ -1,22 +1,17 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+from google import genai
 from datetime import datetime
 import json
 import re
-import google.generativeai as genai
-
+from keys import GEMINI_API_KEY
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'chave-secreta-dev-123'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///fakealert.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # --- CONFIGURAÇÃO DA IA ---
-GEMINI_API_KEY = "Key do gemini".strip()
-
-if GEMINI_API_KEY:
-    genai.configure(api_key=GEMINI_API_KEY)
-
 db = SQLAlchemy(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -173,21 +168,24 @@ def delete_post(post_id):
     return redirect(url_for('admin_dashboard'))
 
 # --- INTEGRAÇÃO GOOGLE AI ---
+client = genai.Client(api_key= GEMINI_API_KEY)
 
 def call_gemini(prompt):
-    if not GEMINI_API_KEY or "SUA_CHAVE" in GEMINI_API_KEY:
-        return {"error": "Chave API não configurada no app.py"}
+    if not GEMINI_API_KEY:
+        return {"error": "Chave API não configurada"}
 
     try:
-        # Usando modelo 2.5-flash
-        model = genai.GenerativeModel('gemini-2.5-flash')
-        response = model.generate_content(prompt)
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=prompt
+        )
         return {"text": response.text}
     except Exception as e:
-        print(f"Erro IA: {e}")
-        return {"error": f"Erro na IA: {str(e)}. Veja o terminal."}
+        print(f"IA encontra-se com problemas no momento.")
+        return {"error": str(e)}
+@app.route('/api/verify_fact', methods=['POST']) 
+@login_required
 
-@app.route('/api/verify_fact', methods=['POST'])
 def verify_fact():
     prompt = f"Analise a veracidade em PT-BR (max 20 palavras) de forma direta e objetiva: {request.json.get('title')} - {request.json.get('content')}"
     result = call_gemini(prompt)
@@ -198,11 +196,10 @@ def verify_fact():
     return jsonify({"result": "Análise IA", "text": result["text"]})
 
 @app.route('/api/generate_content', methods=['POST'])
-@login_required
 def generate_content():
     topic = request.json.get('topic')
     
-    # PROMPT ATUALIZADO PARA RETORNAR 'verified'
+    # PROMPT PARA RETORNAR 'verified'
     prompt = (
         f"Atue como um editor sênior do site 'FakeAlert'. O usuário quer uma notícia atualizada sobre: '{topic}'. "
         f"Sua tarefa: Gere uma manchete e um texto curto sobre esse tema. "
@@ -215,7 +212,7 @@ def generate_content():
     result = call_gemini(prompt)
     
     if "error" in result:
-        return jsonify({"error": result["error"]}), 500
+        return jsonify({"error": result["error"]}), 250
 
     try:
         clean_text = result["text"].replace('```json', '').replace('```', '').strip()
