@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <!-- Cabeçalho do Painel -->
+        <div class="admin-header d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold m-0">Gerenciar Conteúdo</h2>
+            <!-- Botão que leva para a tela de criação (vazia) -->
+            <a href="{{ url_for('post_form') }}" class="btn btn-msn">
+                <i class="fas fa-plus me-2"></i>Nova Notícia
+            </a>
+        </div>
+
+        <!-- Tabela de Posts -->
+        <div class="admin-card bg-white rounded shadow-sm border overflow-hidden">
+            <div class="table-responsive">
+                <table class="admin-table table table-hover mb-0 align-middle">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="ps-4" style="width: 40%;">Manchete</th>
+                            <th>Categoria</th>
+                            <th>Autor</th>
+                            <th>Status</th>
+                            <th>Data</th>
+                            <th class="text-end pe-4">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for post in posts %}
+                        <tr>
+                            <td class="ps-4">
+                                <div class="fw-bold text-dark">{{ post.title }}</div>
+                                <div class="text-muted small text-truncate" style="max-width: 300px;">
+                                    {{ post.content }}
+                                </div>
+                            </td>
+                            <td><span class="badge bg-light text-dark border">{{ post.category }}</span></td>
+                            <td>{{ post.author }}</td>
+                            <td>
+                                {% if post.verified %}
+                                    <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25">Real</span>
+                                {% else %}
+                                    <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25">Fake</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-muted small">{{ post.date_posted.strftime('%d/%m/%Y') }}</td>
+                            <td class="text-end pe-4">
+                                <!-- Botão EDITAR: Leva para o formulário preenchido -->
+                                <a href="{{ url_for('post_form', post_id=post.id) }}" class="btn btn-sm btn-outline-primary border-0 me-1" title="Editar">
+                                    <i class="fas fa-pen"></i>
+                                </a>
+                                <!-- Botão EXCLUIR -->
+                                <a href="{{ url_for('delete_post', post_id=post.id) }}" class="btn btn-sm btn-outline-danger border-0" onclick="return confirm('Tem certeza que deseja excluir esta notícia permanentemente?')" title="Excluir">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        
+                        {% if not posts %}
+                        <tr>
+                            <td colspan="6" class="text-center py-5 text-muted">
+                                <i class="far fa-folder-open fa-2x mb-3 opacity-25"></i>
+                                <p>Nenhuma notícia cadastrada ainda.</p>
+                            </td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

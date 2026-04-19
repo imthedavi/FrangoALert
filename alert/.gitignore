@@ -1,0 +1,5 @@
+__python__/
+*.pyc
+*.db
+instance/
+.env

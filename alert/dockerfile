@@ -1,0 +1,28 @@
+FROM python:3.11-slim
+
+# Evita gerar arquivos inúteis
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+# Diretório de trabalho
+WORKDIR /app
+
+# Instala dependências do sistema (necessárias em muitos casos)
+RUN apt-get update && apt-get install -y \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copia requirements primeiro (cache eficiente)
+COPY requirements.txt .
+
+# Instala dependências Python
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copia o resto do projeto
+COPY . .
+
+# Expõe a porta do app
+EXPOSE 5000
+
+# Comando de produção (NÃO usar app.run)
+CMD ["gunicorn", "--workers", "3", "--bind", "0.0.0.0:5000", "app:app"]

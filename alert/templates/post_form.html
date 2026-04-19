@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        
+        <!-- Cabeçalho -->
+        <div class="admin-header mb-4 d-flex justify-content-between align-items-center">
+            <h3 class="fw-bold m-0">{{ 'Editar Notícia' if post else 'Nova Notícia' }}</h3>
+            <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-secondary btn-sm">Cancelar</a>
+        </div>
+
+        <!-- ASSISTENTE DE REDAÇÃO IA -->
+        {% if not post %}
+        <div class="card border-0 shadow-sm mb-4 overflow-hidden">
+            <div class="card-body p-4" style="background: linear-gradient(135deg, #f9f9ff 0%, #eef2ff 100%); border-left: 4px solid #6366f1;">
+                <h5 class="fw-bold text-primary mb-3">
+                    <i class="fas fa-robot me-2"></i>Assistente de Redação IA
+                </h5>
+                <p class="text-muted small mb-3">Digite um tema e a IA decidirá se cria um Fato ou Fake para você.</p>
+                
+                <div class="input-group">
+                    <input type="text" id="ai-topic" class="form-control border-secondary-subtle" placeholder="Ex: GTA 6...">
+                    <button class="btn btn-primary" type="button" onclick="generateDraft()" id="btn-generate">
+                        <i class="fas fa-magic me-2"></i>Gerar Rascunho
+                    </button>
+                </div>
+                <div id="ai-status" class="mt-2 small fw-bold"></div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Formulário Principal -->
+        <div class="news-card p-4">
+            <form method="POST">
+                <div class="mb-3">
+                    <label class="form-label small fw-bold text-secondary">MANCHETE</label>
+                    <input type="text" name="title" id="post-title" class="form-control" value="{{ post.title if post else '' }}" required>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label small fw-bold text-secondary">CATEGORIA</label>
+                        <select name="category" class="form-select">
+                            {% set cats = ['Brasil', 'Mundo', 'Tecnologia', 'Saúde', 'Economia'] %}
+                            {% for cat in cats %}
+                                <option value="{{ cat }}" {{ 'selected' if post and post.category == cat else '' }}>{{ cat }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label small fw-bold text-secondary">AUTOR</label>
+                        <input type="text" name="author" class="form-control" value="{{ post.author if post else 'Redação' }}" required>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label small fw-bold text-secondary">IMAGEM DE CAPA (URL)</label>
+                    <input type="text" name="image_url" class="form-control" value="{{ post.image_url if post else '' }}" placeholder="https://...">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label small fw-bold text-secondary">CONTEÚDO DA NOTÍCIA</label>
+                    <textarea name="content" id="post-content" class="form-control" rows="8" required>{{ post.content if post else '' }}</textarea>
+                </div>
+
+                <div class="mb-4 p-3 bg-light rounded border">
+                    <label class="form-label small fw-bold text-secondary mb-2">CLASSIFICAÇÃO (IA SUGERE ABAIXO)</label>
+                    <div class="d-flex gap-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="verified" id="v1" value="1" {{ 'checked' if not post or post.verified else '' }}>
+                            <label class="form-check-label text-success fw-bold" for="v1">
+                                <i class="fas fa-check-circle me-1"></i> Verdadeiro
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="verified" id="v0" value="0" {{ 'checked' if post and not post.verified else '' }}>
+                            <label class="form-check-label text-danger fw-bold" for="v0">
+                                <i class="fas fa-exclamation-triangle me-1"></i> Fake News
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-grid">
+                    <button class="btn btn-msn py-2">
+                        {{ 'Salvar Alterações' if post else 'Publicar Notícia' }}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+async function generateDraft() {
+    const topicInput = document.getElementById('ai-topic');
+    const statusDiv = document.getElementById('ai-status');
+    const btn = document.getElementById('btn-generate');
+    
+    const topic = topicInput.value.trim();
+    
+    if (!topic) {
+        alert("Por favor, digite um tema para a IA.");
+        return;
+    }
+    
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-circle-notch fa-spin me-2"></i>Escrevendo...';
+    statusDiv.innerHTML = '<span class="text-primary">A IA está criando sua notícia...</span>';
+    
+    try {
+        const response = await fetch('/api/generate_content', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ topic: topic })
+        });
+        
+        const data = await response.json();
+        
+        if (data.error) {
+            statusDiv.innerHTML = `<span class="text-danger"><i class="fas fa-times-circle"></i> Erro: ${data.error}</span>`;
+        } else {
+            document.getElementById('post-title').value = data.title;
+            document.getElementById('post-content').value = data.content;
+            
+            // AUTO-SELEÇÃO DO RADIO BUTTON
+            if (data.verified === true) {
+                document.getElementById('v1').checked = true;
+                statusDiv.innerHTML = '<span class="text-success"><i class="fas fa-check-circle"></i> Rascunho VERDADEIRO gerado!</span>';
+            } else {
+                document.getElementById('v0').checked = true;
+                statusDiv.innerHTML = '<span class="text-danger"><i class="fas fa-exclamation-triangle"></i> Rascunho FAKE NEWS gerado!</span>';
+            }
+        }
+    } catch (e) {
+        statusDiv.innerHTML = '<span class="text-danger">Erro de conexão.</span>';
+        console.error(e);
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-magic me-2"></i>Gerar Rascunho';
+    }
+}
+</script>
+{% endblock %}
