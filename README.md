@@ -7,7 +7,7 @@ O sistema analisa textos e retorna uma avaliação sobre possível fake news.
 
 ## 🚀 Acesse o projeto
 
-https://alert.frangro.com.br
+ _https://alert.frangro.com.br_ (desativado até 27/04 - Segunda-Feira)
 
 ---
 
